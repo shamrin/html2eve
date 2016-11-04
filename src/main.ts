@@ -65,7 +65,7 @@ let stringify = (source: Record, level: number = 0): string => {
 
 let convertDocument = (str: string): string => {
     return stringify(parse(new DOMParser().parseFromString(str, "text/html").body));
-}
+};
 
 // convertDocument('<img src="//" onerror="console.log(\'You are pwned!\')" />');
 
