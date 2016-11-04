@@ -6,7 +6,7 @@ interface Record {
 }
 
 interface PropertyValue {
-    name: string;
+    property: string;
     value: string;
 }
 
@@ -21,7 +21,7 @@ let parse = (thing: HTMLElement): Record => {
     if (thing.style.cssText) {
         for (let i = 0; i < thing.style.length; i++) {
             element.style.push({
-                name: thing.style[i],
+                property: thing.style[i],
                 value: thing.style.getPropertyValue(thing.style[i])
             });
         }
@@ -49,7 +49,7 @@ let stringify = (source: Record, level: number = 0): string => {
     }
 
     if (source.style.length) {
-        attrs += ` style: [${source.style.map(({name, value}) => `${name}: "${value}"`).join(', ')}]`;
+        attrs += ` style: [${source.style.map(({property, value}) => `${property}: "${value}"`).join(', ')}]`;
     }
 
     if (source.children.length) {
