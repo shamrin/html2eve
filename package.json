@@ -1,6 +1,10 @@
 {
   "dependencies": {
-    "@types/parse5": "^2.2.34",
-    "parse5": "^2.2.3"
+    "systemjs": "^0.19.40"
+  },
+  "scripts": {
+    "start": "npm run build && npm run server",
+    "build": "./build.sh",
+    "server": "cd build/ && python -m SimpleHTTPServer 8044"
   }
 }
