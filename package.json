@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "@types/parse5": "^2.2.34",
+    "parse5": "^2.2.3"
+  }
+}
