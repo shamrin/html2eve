@@ -10,9 +10,64 @@ interface PropertyValue {
     value: string;
 }
 
+// taken from https://github.com/witheve/Eve/blob/4fecae43c108a54d0a4b97b1157ce74c68834e91/src/renderer.ts#L44-L52
+let supportedTags : { [tag: string]: boolean; } = {
+  "div": true, "span": true, "input": true, "ul": true, "li": true, "label": true, "button": true, "header": true, "footer": true, "a": true, "strong": true,
+  "h1": true, "h2": true, "h3": true, "h4": true, "h5": true, "h6": true,
+  "ol": true, "p": true, "pre": true, "em": true, "img": true, "canvas": true, "script": true, "style": true, "video": true,
+  "table": true, "tbody": true, "thead": true, "tr": true, "th": true, "td": true,
+  "form": true, "optgroup": true, "option": true, "select": true, "textarea": true,
+  "title": true, "meta": true, "link": true,
+  "svg": true, "circle": true, "line": true, "rect": true, "polygon":true, "text": true, "image": true, "defs": true, "pattern": true, "linearGradient": true, "g": true, "path": true
+};
+
+// taken from https://developer.mozilla.org/en-US/docs/Web/HTML/Inline_elements
+let inlineElements : { [tag: string]: boolean; } = {
+  "b": true,
+  "big": true,
+  "i": true,
+  "small": true,
+  "tt": true,
+  "abbr": true,
+  "acronym": true,
+  "cite": true,
+  "code": true,
+  "dfn": true,
+  "em": true,
+  "kbd": true,
+  "strong": true,
+  "samp": true,
+  "time": true,
+  "var": true,
+  "a": true,
+  "bdo": true,
+  "br": true,
+  "img": true,
+  "map": true,
+  "object": true,
+  "q": true,
+  "script": true,
+  "span": true,
+  "sub": true,
+  "sup": true,
+  "button": true,
+  "input": true,
+  "label": true,
+  "select": true,
+  "textarea": true
+};
+
 let parse = (thing: HTMLElement): Record => {
+    let tag = thing.nodeName.toLowerCase();
+
+    if (!supportedTags[tag]) {
+        let newTag = inlineElements[tag] ? 'span' : 'div';
+        console.warn(`<${tag}> tag not supported by Eve, using [#${newTag}]`);
+        tag = newTag;
+    }
+
     let element: Record = {
-        tag: thing.nodeName.toLowerCase(),
+        tag,
         children: [],
         class: thing.className,
         style: []
