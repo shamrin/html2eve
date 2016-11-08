@@ -80,27 +80,27 @@ let repeat = (s: string, num: number) =>
 let indent = (level: number): string =>
     repeat(' ', level * 2);
 
-let stringify = (source: Record, level: number = 0): string => {
+let stringify = (record: Record, level: number = 0): string => {
     let attrs = '';
 
-    for (let key in source.attrs) {
-        if (source.attrs[key]) {
-            attrs += ` ${key}: "${source.attrs[key]}"`;
+    for (let key in record.attrs) {
+        if (record.attrs[key]) {
+            attrs += ` ${key}: "${record.attrs[key]}"`;
         }
     }
 
-    if (source.style.length) {
-        attrs += ` style: [${source.style.map(({property, value}) => `${property}: "${value}"`).join(', ')}]`;
+    if (record.style.length) {
+        attrs += ` style: [${record.style.map(({property, value}) => `${property}: "${value}"`).join(', ')}]`;
     }
 
-    if (source.children.length) {
-        let children = source.children.map(child =>
+    if (record.children.length) {
+        let children = record.children.map(child =>
             stringify(child, level + 1)
         ).join(`\n${indent(level + 1)}`);
 
-        return `[#${source.tag}${attrs} children:\n${indent(level + 1)}${children}\n${indent(level)}]`;
+        return `[#${record.tag}${attrs} children:\n${indent(level + 1)}${children}\n${indent(level)}]`;
     } else {
-        return `[#${source.tag}${attrs}]`;
+        return `[#${record.tag}${attrs}]`;
     }
 };
 
