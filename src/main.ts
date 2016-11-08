@@ -32,7 +32,8 @@ let inlineElements : { [tag: string]: boolean; } = {
   "textarea": true
 };
 
-let parse = ({nodeName, hasAttributes, attributes, style, childNodes}: HTMLElement): Record => {
+let parse = (element: HTMLElement): Record => {
+    let {nodeName, attributes, style, childNodes} = element;
     let tag = nodeName.toLowerCase();
 
     if (!supportedTags[tag]) {
@@ -48,7 +49,7 @@ let parse = ({nodeName, hasAttributes, attributes, style, childNodes}: HTMLEleme
         style: []
     };
 
-    if (hasAttributes()) {
+    if (element.hasAttributes()) {
         for(let i = 0; i < attributes.length; i++) {
             let {name, value} = attributes[i];
             if (name !== 'style') {
