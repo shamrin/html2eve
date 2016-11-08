@@ -1,8 +1,10 @@
 interface Record {
     tag: string;
     children: Record[];
-    class: string;
     style: PropertyValue[];
+    attrs: {
+        [name: string]: string
+    };
 }
 
 interface PropertyValue {
@@ -57,8 +59,8 @@ let inlineElements : { [tag: string]: boolean; } = {
   "textarea": true
 };
 
-let parse = (thing: HTMLElement): Record => {
-    let tag = thing.nodeName.toLowerCase();
+let parse = (element: HTMLElement): Record => {
+    let tag = element.nodeName.toLowerCase();
 
     if (!supportedTags[tag]) {
         let newTag = inlineElements[tag] ? 'span' : 'div';
@@ -66,29 +68,38 @@ let parse = (thing: HTMLElement): Record => {
         tag = newTag;
     }
 
-    let element: Record = {
+    let record: Record = {
         tag,
         children: [],
-        class: thing.className,
+        attrs: {},
         style: []
     };
 
-    if (thing.style.cssText) {
-        for (let i = 0; i < thing.style.length; i++) {
-            element.style.push({
-                property: thing.style[i],
-                value: thing.style.getPropertyValue(thing.style[i])
+    if (element.hasAttributes()) {
+        for(let i = 0; i < element.attributes.length; i++) {
+            let {name, value} = element.attributes[i];
+            if (name !== 'style') {
+                record.attrs[name] = value;
+            }
+        }
+    }
+
+    if (element.style.cssText) {
+        for (let i = 0; i < element.style.length; i++) {
+            record.style.push({
+                property: element.style[i],
+                value: element.style.getPropertyValue(element.style[i])
             });
         }
     };
 
-    if (thing.childNodes) {
-        for(let i = 0; i < thing.childNodes.length; i++) {
-            element.children.push(parse(<HTMLElement>thing.childNodes[i]));
+    if (element.childNodes) {
+        for(let i = 0; i < element.childNodes.length; i++) {
+            record.children.push(parse(<HTMLElement>element.childNodes[i]));
         }
     }
 
-    return element;
+    return record;
 };
 
 let repeat = (s: string, num: number) =>
@@ -99,8 +110,10 @@ let indent = (level: number): string =>
 let stringify = (source: Record, level: number = 0): string => {
     let attrs = '';
 
-    if (source.class) {
-        attrs += ` class: "${source.class}"`;
+    for (let key in source.attrs) {
+        if (source.attrs[key]) {
+            attrs += ` ${key}: "${source.attrs[key]}"`;
+        }
     }
 
     if (source.style.length) {
@@ -109,8 +122,8 @@ let stringify = (source: Record, level: number = 0): string => {
 
     if (source.children.length) {
         let children = source.children.map(child =>
-            stringify(child, level + 1)).join(`\n${indent(level + 1)}`
-        );
+            stringify(child, level + 1)
+        ).join(`\n${indent(level + 1)}`);
 
         return `[#${source.tag}${attrs} children:\n${indent(level + 1)}${children}\n${indent(level)}]`;
     } else {
@@ -124,6 +137,6 @@ let convertDocument = (str: string): string => {
 
 // convertDocument('<img src="//" onerror="console.log(\'You are pwned!\')" />');
 
-let test = `<div id="elm"><div class="main-button"><i class="fa fa-close fa-3x" style="transform: rotate(-0.785398rad);"></i><div class="message" style="display: block; opacity: 0;"></div><div class="child-button" style="transform: rotate(1.75929rad) translateY(0px) rotate(-1.75929rad); background-color: rgb(238, 238, 236);"><i class="fa  fa-lg fa-pencil"></i></div><div class="child-button" style="transform: rotate(2.45044rad) translateY(0px) rotate(-2.45044rad); background-color: rgb(238, 238, 236);"><i class="fa  fa-lg fa-at"></i></div><div class="child-button" style="transform: rotate(3.14159rad) translateY(0px) rotate(-3.14159rad); background-color: rgb(238, 238, 236);"><i class="fa  fa-lg fa-camera"></i></div><div class="child-button" style="transform: rotate(3.83274rad) translateY(0px) rotate(-3.83274rad); background-color: rgb(238, 238, 236);"><i class="fa  fa-lg fa-bell"></i></div><div class="child-button" style="transform: rotate(4.52389rad) translateY(0px) rotate(-4.52389rad); background-color: rgb(238, 238, 236);"><i class="fa  fa-lg fa-comment"></i></div></div></div>`;
+let test = `<div id="elm"><div class="main-button" title="click me!"><i class="fa fa-close fa-3x" style="transform: rotate(-0.785398rad);"></i><div class="message" style="display: block; opacity: 0;"></div><div class="child-button" style="transform: rotate(1.75929rad) translateY(0px) rotate(-1.75929rad); background-color: rgb(238, 238, 236);"><i class="fa  fa-lg fa-pencil"></i></div><div class="child-button" style="transform: rotate(2.45044rad) translateY(0px) rotate(-2.45044rad); background-color: rgb(238, 238, 236);"><i class="fa  fa-lg fa-at"></i></div><div class="child-button" style="transform: rotate(3.14159rad) translateY(0px) rotate(-3.14159rad); background-color: rgb(238, 238, 236);"><i class="fa  fa-lg fa-camera"></i></div><div class="child-button" style="transform: rotate(3.83274rad) translateY(0px) rotate(-3.83274rad); background-color: rgb(238, 238, 236);"><i class="fa  fa-lg fa-bell"></i></div><div class="child-button" style="transform: rotate(4.52389rad) translateY(0px) rotate(-4.52389rad); background-color: rgb(238, 238, 236);"><i class="fa  fa-lg fa-comment"></i></div></div></div>`;
 
 console.log(convertDocument(test));
