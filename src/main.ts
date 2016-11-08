@@ -32,8 +32,8 @@ let inlineElements : { [tag: string]: boolean; } = {
   "textarea": true
 };
 
-let parse = (element: HTMLElement): Record => {
-    let tag = element.nodeName.toLowerCase();
+let parse = ({nodeName, hasAttributes, attributes, style, childNodes}: HTMLElement): Record => {
+    let tag = nodeName.toLowerCase();
 
     if (!supportedTags[tag]) {
         let newTag = inlineElements[tag] ? 'span' : 'div';
@@ -48,27 +48,27 @@ let parse = (element: HTMLElement): Record => {
         style: []
     };
 
-    if (element.hasAttributes()) {
-        for(let i = 0; i < element.attributes.length; i++) {
-            let {name, value} = element.attributes[i];
+    if (hasAttributes()) {
+        for(let i = 0; i < attributes.length; i++) {
+            let {name, value} = attributes[i];
             if (name !== 'style') {
                 record.attrs[name] = value;
             }
         }
     }
 
-    if (element.style.cssText) {
-        for (let i = 0; i < element.style.length; i++) {
+    if (style.cssText) {
+        for (let i = 0; i < style.length; i++) {
             record.style.push({
-                property: element.style[i],
-                value: element.style.getPropertyValue(element.style[i])
+                property: style[i],
+                value: style.getPropertyValue(style[i])
             });
         }
     };
 
-    if (element.childNodes) {
-        for(let i = 0; i < element.childNodes.length; i++) {
-            record.children.push(parse(<HTMLElement>element.childNodes[i]));
+    if (childNodes) {
+        for(let i = 0; i < childNodes.length; i++) {
+            record.children.push(parse(<HTMLElement>childNodes[i]));
         }
     }
 
