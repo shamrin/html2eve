@@ -38,7 +38,7 @@ let parse = (element: HTMLElement): Record => {
 
     if (!supportedTags[tag]) {
         let newTag = inlineElements[tag] ? 'span' : 'div';
-        console.warn(`<${tag}> tag not supported by Eve, using [#${newTag}]`);
+        console.warn(`<${tag}> tag not supported by Eve, using [#${newTag}] instead of [#${tag}]`);
         tag = newTag;
     }
 
