@@ -5,6 +5,12 @@
   "scripts": {
     "start": "npm run build && npm run server",
     "build": "./build.sh",
-    "server": "cd build/ && python -m SimpleHTTPServer 8044"
+    "server": "cd build/ && python -m SimpleHTTPServer 8044",
+    "test": "node ./build/test/all.js | faucet"
+  },
+  "devDependencies": {
+    "@types/tape": "^4.2.28",
+    "faucet": "^0.0.1",
+    "tape": "^4.6.2"
   }
 }
